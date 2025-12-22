@@ -20,104 +20,97 @@ jobs:
           mkdir -p .github/workflows
 
           # Workflow 1: ImageMagick
-          cat <<'EOF' > .github/workflows/mirror_imagemagick.yml
-name: infinite-mirror-imagemagick
-on:
-  workflow_dispatch:
-jobs:
-  render:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Install ImageMagick
-        run: sudo apt-get update && sudo apt-get install -y imagemagick
-      - name: Generate image
-        run: |
-          convert -size 512x512 xc:black base.png
-          for i in $(seq 1 15); do
-            scale=$((100 - i*5))
-            convert base.png -resize ${scale}% temp.png
-            convert base.png temp.png -gravity center -composite base.png
-          done
-          mv base.png mirror_imagemagick.png
-      - name: Upload artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: mirror_imagemagick
-          path: mirror_imagemagick.png
-EOF
+          echo "name: infinite-mirror-imagemagick" > .github/workflows/mirror_imagemagick.yml
+          echo "on:" >> .github/workflows/mirror_imagemagick.yml
+          echo "  workflow_dispatch:" >> .github/workflows/mirror_imagemagick.yml
+          echo "jobs:" >> .github/workflows/mirror_imagemagick.yml
+          echo "  render:" >> .github/workflows/mirror_imagemagick.yml
+          echo "    runs-on: ubuntu-latest" >> .github/workflows/mirror_imagemagick.yml
+          echo "    steps:" >> .github/workflows/mirror_imagemagick.yml
+          echo "      - name: Install ImageMagick" >> .github/workflows/mirror_imagemagick.yml
+          echo "        run: sudo apt-get update && sudo apt-get install -y imagemagick" >> .github/workflows/mirror_imagemagick.yml
+          echo "      - name: Generate image" >> .github/workflows/mirror_imagemagick.yml
+          echo "        run: |" >> .github/workflows/mirror_imagemagick.yml
+          echo "          convert -size 512x512 xc:black base.png" >> .github/workflows/mirror_imagemagick.yml
+          echo "          for i in \$(seq 1 15); do" >> .github/workflows/mirror_imagemagick.yml
+          echo "            scale=\$((100 - i*5))" >> .github/workflows/mirror_imagemagick.yml
+          echo "            convert base.png -resize \${scale}% temp.png" >> .github/workflows/mirror_imagemagick.yml
+          echo "            convert base.png temp.png -gravity center -composite base.png" >> .github/workflows/mirror_imagemagick.yml
+          echo "          done" >> .github/workflows/mirror_imagemagick.yml
+          echo "          mv base.png mirror_imagemagick.png" >> .github/workflows/mirror_imagemagick.yml
+          echo "      - name: Upload artifact" >> .github/workflows/mirror_imagemagick.yml
+          echo "        uses: actions/upload-artifact@v4" >> .github/workflows/mirror_imagemagick.yml
+          echo "        with:" >> .github/workflows/mirror_imagemagick.yml
+          echo "          name: mirror_imagemagick" >> .github/workflows/mirror_imagemagick.yml
+          echo "          path: mirror_imagemagick.png" >> .github/workflows/mirror_imagemagick.yml
 
           # Workflow 2: Python Pillow
-          cat <<'EOF' > .github/workflows/mirror_pillow.yml
-name: infinite-mirror-pillow
-on:
-  workflow_dispatch:
-jobs:
-  render:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Install Python dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install pillow
-      - name: Generate image
-        run: |
-          python - <<'PYTHON'
-from PIL import Image, ImageDraw
-size = 512
-base = Image.new("RGB", (size, size), "black")
-for i in range(15):
-    scale = size - i*20
-    overlay = base.resize((scale, scale))
-    base.paste(overlay, ((size-scale)//2,(size-scale)//2))
-base.save("mirror_pillow.png")
-PYTHON
-      - name: Upload artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: mirror_pillow
-          path: mirror_pillow.png
-EOF
+          echo "name: infinite-mirror-pillow" > .github/workflows/mirror_pillow.yml
+          echo "on:" >> .github/workflows/mirror_pillow.yml
+          echo "  workflow_dispatch:" >> .github/workflows/mirror_pillow.yml
+          echo "jobs:" >> .github/workflows/mirror_pillow.yml
+          echo "  render:" >> .github/workflows/mirror_pillow.yml
+          echo "    runs-on: ubuntu-latest" >> .github/workflows/mirror_pillow.yml
+          echo "    steps:" >> .github/workflows/mirror_pillow.yml
+          echo "      - name: Install Python dependencies" >> .github/workflows/mirror_pillow.yml
+          echo "        run: |" >> .github/workflows/mirror_pillow.yml
+          echo "          python -m pip install --upgrade pip" >> .github/workflows/mirror_pillow.yml
+          echo "          pip install pillow" >> .github/workflows/mirror_pillow.yml
+          echo "      - name: Generate image" >> .github/workflows/mirror_pillow.yml
+          echo "        run: |" >> .github/workflows/mirror_pillow.yml
+          echo "          python - <<'PYTHON'" >> .github/workflows/mirror_pillow.yml
+          echo "from PIL import Image, ImageDraw" >> .github/workflows/mirror_pillow.yml
+          echo "size = 512" >> .github/workflows/mirror_pillow.yml
+          echo "base = Image.new('RGB', (size, size), 'black')" >> .github/workflows/mirror_pillow.yml
+          echo "for i in range(15):" >> .github/workflows/mirror_pillow.yml
+          echo "    scale = size - i*20" >> .github/workflows/mirror_pillow.yml
+          echo "    overlay = base.resize((scale, scale))" >> .github/workflows/mirror_pillow.yml
+          echo "    base.paste(overlay, ((size-scale)//2,(size-scale)//2))" >> .github/workflows/mirror_pillow.yml
+          echo "base.save('mirror_pillow.png')" >> .github/workflows/mirror_pillow.yml
+          echo "PYTHON" >> .github/workflows/mirror_pillow.yml
+          echo "      - name: Upload artifact" >> .github/workflows/mirror_pillow.yml
+          echo "        uses: actions/upload-artifact@v4" >> .github/workflows/mirror_pillow.yml
+          echo "        with:" >> .github/workflows/mirror_pillow.yml
+          echo "          name: mirror_pillow" >> .github/workflows/mirror_pillow.yml
+          echo "          path: mirror_pillow.png" >> .github/workflows/mirror_pillow.yml
 
           # Workflow 3: Node Canvas
-          cat <<'EOF' > .github/workflows/mirror_canvas.yml
-name: infinite-mirror-canvas
-on:
-  workflow_dispatch:
-jobs:
-  render:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Install Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-      - name: Install canvas
-        run: npm install canvas
-      - name: Generate image
-        run: |
-          node -e "
-          const { createCanvas } = require('canvas');
-          const fs = require('fs');
-          const size = 512;
-          const canvas = createCanvas(size, size);
-          const ctx = canvas.getContext('2d');
-          ctx.fillStyle = 'black';
-          ctx.fillRect(0,0,size,size);
-          for(let i=0;i<15;i++){
-            const scale = size - i*20;
-            ctx.fillStyle = 'rgba(255,255,255,0.05)';
-            ctx.fillRect((size-scale)/2,(size-scale)/2,scale,scale);
-          }
-          const out = fs.createWriteStream('mirror_canvas.png');
-          const stream = canvas.createPNGStream();
-          stream.pipe(out);
-          "
-      - name: Upload artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: mirror_canvas
-          path: mirror_canvas.png
-EOF
+          echo "name: infinite-mirror-canvas" > .github/workflows/mirror_canvas.yml
+          echo "on:" >> .github/workflows/mirror_canvas.yml
+          echo "  workflow_dispatch:" >> .github/workflows/mirror_canvas.yml
+          echo "jobs:" >> .github/workflows/mirror_canvas.yml
+          echo "  render:" >> .github/workflows/mirror_canvas.yml
+          echo "    runs-on: ubuntu-latest" >> .github/workflows/mirror_canvas.yml
+          echo "    steps:" >> .github/workflows/mirror_canvas.yml
+          echo "      - name: Install Node.js" >> .github/workflows/mirror_canvas.yml
+          echo "        uses: actions/setup-node@v4" >> .github/workflows/mirror_canvas.yml
+          echo "        with:" >> .github/workflows/mirror_canvas.yml
+          echo "          node-version: 20" >> .github/workflows/mirror_canvas.yml
+          echo "      - name: Install canvas" >> .github/workflows/mirror_canvas.yml
+          echo "        run: npm install canvas" >> .github/workflows/mirror_canvas.yml
+          echo "      - name: Generate image" >> .github/workflows/mirror_canvas.yml
+          echo "        run: |" >> .github/workflows/mirror_canvas.yml
+          echo "          node -e \"const { createCanvas } = require('canvas');" >> .github/workflows/mirror_canvas.yml
+          echo "          const fs = require('fs');" >> .github/workflows/mirror_canvas.yml
+          echo "          const size = 512;" >> .github/workflows/mirror_canvas.yml
+          echo "          const canvas = createCanvas(size, size);" >> .github/workflows/mirror_canvas.yml
+          echo "          const ctx = canvas.getContext('2d');" >> .github/workflows/mirror_canvas.yml
+          echo "          ctx.fillStyle = 'black';" >> .github/workflows/mirror_canvas.yml
+          echo "          ctx.fillRect(0,0,size,size);" >> .github/workflows/mirror_canvas.yml
+          echo "          for(let i=0;i<15;i++){" >> .github/workflows/mirror_canvas.yml
+          echo "            const scale = size - i*20;" >> .github/workflows/mirror_canvas.yml
+          echo "            ctx.fillStyle = 'rgba(255,255,255,0.05)';" >> .github/workflows/mirror_canvas.yml
+          echo "            ctx.fillRect((size-scale)/2,(size-scale)/2,scale,scale);" >> .github/workflows/mirror_canvas.yml
+          echo "          }" >> .github/workflows/mirror_canvas.yml
+          echo "          const out = fs.createWriteStream('mirror_canvas.png');" >> .github/workflows/mirror_canvas.yml
+          echo "          const stream = canvas.createPNGStream();" >> .github/workflows/mirror_canvas.yml
+          echo "          stream.pipe(out);" >> .github/workflows/mirror_canvas.yml
+          echo "        \"" >> .github/workflows/mirror_canvas.yml
+          echo "      - name: Upload artifact" >> .github/workflows/mirror_canvas.yml
+          echo "        uses: actions/upload-artifact@v4" >> .github/workflows/mirror_canvas.yml
+          echo "        with:" >> .github/workflows/mirror_canvas.yml
+          echo "          name: mirror_canvas" >> .github/workflows/mirror_canvas.yml
+          echo "          path: mirror_canvas.png" >> .github/workflows/mirror_canvas.yml
 
       - name: Commit generated workflows
         run: |
