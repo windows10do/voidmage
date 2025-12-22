@@ -115,5 +115,10 @@ jobs:
       - name: Commit generated workflows
         run: |
           git add .github/workflows/mirror_*.yml
-          git commit -m "seed: generate 3 mirror workflows"
-          git push
+          # Check if there are changes before committing
+          if git diff --cached --quiet; then
+            echo "No changes to commit."
+          else
+            git commit -m "seed: generate 3 mirror workflows"
+            git push
+          fi
