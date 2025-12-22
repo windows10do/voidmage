@@ -68,7 +68,7 @@ base = Image.new("RGB", (size, size), "black")
 for i in range(15):
     scale = size - i*20
     overlay = base.resize((scale, scale))
-    base.paste(overlay, ((size-scale)//2,(size-scale)//2)))
+    base.paste(overlay, ((size-scale)//2,(size-scale)//2))
 base.save("mirror_pillow.png")
 PYTHON
       - name: Upload artifact
