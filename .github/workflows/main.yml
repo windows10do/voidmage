@@ -1,0 +1,126 @@
+name: mirror-seeder
+
+on:
+  workflow_dispatch:
+
+jobs:
+  seed:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure git
+        run: |
+          git config user.name "mirror-bot"
+          git config user.email "mirror@users.noreply.github.com"
+
+      - name: Generate 3 different workflows
+        run: |
+          mkdir -p .github/workflows
+
+          # Workflow 1: ImageMagick
+          cat <<'EOF' > .github/workflows/mirror_imagemagick.yml
+name: infinite-mirror-imagemagick
+on:
+  workflow_dispatch:
+jobs:
+  render:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install ImageMagick
+        run: sudo apt-get update && sudo apt-get install -y imagemagick
+      - name: Generate image
+        run: |
+          convert -size 512x512 xc:black base.png
+          for i in $(seq 1 15); do
+            scale=$((100 - i*5))
+            convert base.png -resize ${scale}% temp.png
+            convert base.png temp.png -gravity center -composite base.png
+          done
+          mv base.png mirror_imagemagick.png
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: mirror_imagemagick
+          path: mirror_imagemagick.png
+EOF
+
+          # Workflow 2: Python Pillow
+          cat <<'EOF' > .github/workflows/mirror_pillow.yml
+name: infinite-mirror-pillow
+on:
+  workflow_dispatch:
+jobs:
+  render:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pillow
+      - name: Generate image
+        run: |
+          python - <<'PYTHON'
+from PIL import Image, ImageDraw
+size = 512
+base = Image.new("RGB", (size, size), "black")
+for i in range(15):
+    scale = size - i*20
+    overlay = base.resize((scale, scale))
+    base.paste(overlay, ((size-scale)//2,(size-scale)//2)))
+base.save("mirror_pillow.png")
+PYTHON
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: mirror_pillow
+          path: mirror_pillow.png
+EOF
+
+          # Workflow 3: Node Canvas
+          cat <<'EOF' > .github/workflows/mirror_canvas.yml
+name: infinite-mirror-canvas
+on:
+  workflow_dispatch:
+jobs:
+  render:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Install canvas
+        run: npm install canvas
+      - name: Generate image
+        run: |
+          node -e "
+          const { createCanvas } = require('canvas');
+          const fs = require('fs');
+          const size = 512;
+          const canvas = createCanvas(size, size);
+          const ctx = canvas.getContext('2d');
+          ctx.fillStyle = 'black';
+          ctx.fillRect(0,0,size,size);
+          for(let i=0;i<15;i++){
+            const scale = size - i*20;
+            ctx.fillStyle = 'rgba(255,255,255,0.05)';
+            ctx.fillRect((size-scale)/2,(size-scale)/2,scale,scale);
+          }
+          const out = fs.createWriteStream('mirror_canvas.png');
+          const stream = canvas.createPNGStream();
+          stream.pipe(out);
+          "
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: mirror_canvas
+          path: mirror_canvas.png
+EOF
+
+      - name: Commit generated workflows
+        run: |
+          git add .github/workflows/mirror_*.yml
+          git commit -m "seed: generate 3 mirror workflows"
+          git push
